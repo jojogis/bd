@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: localhost
--- Время создания: Окт 20 2020 г., 20:24
+-- Время создания: Окт 20 2020 г., 20:31
 -- Версия сервера: 5.7.27-30
 -- Версия PHP: 7.1.30
 
@@ -196,19 +196,6 @@ CREATE TABLE `projects` (
 -- --------------------------------------------------------
 
 --
--- Структура таблицы `task`
---
-
-CREATE TABLE `task` (
-  `id` int(10) UNSIGNED NOT NULL,
-  `name` varchar(45) NOT NULL,
-  `real_date_of_complete` date DEFAULT NULL,
-  `plan_date_of_complete` date NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
--- --------------------------------------------------------
-
---
 -- Структура таблицы `tasks`
 --
 
@@ -286,12 +273,6 @@ ALTER TABLE `projects`
   ADD KEY `fk_project_task1_idx` (`task_id`),
   ADD KEY `fk_projects_orders1_idx` (`orders_id`),
   ADD KEY `fk_projects_categories1_idx` (`categories_id`);
-
---
--- Индексы таблицы `task`
---
-ALTER TABLE `task`
-  ADD PRIMARY KEY (`id`);
 
 --
 -- Индексы таблицы `tasks`
