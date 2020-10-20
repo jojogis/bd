@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: localhost
--- Время создания: Окт 20 2020 г., 17:16
+-- Время создания: Окт 20 2020 г., 17:59
 -- Версия сервера: 5.7.27-30
 -- Версия PHP: 7.1.30
 
@@ -55,7 +55,7 @@ CREATE TABLE `customers` (
   `id` int(10) UNSIGNED NOT NULL,
   `name` varchar(45) DEFAULT NULL,
   `address` varchar(100) DEFAULT NULL,
-  `phone` varchar(15) DEFAULT NULL
+  `phone` varchar(20) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -81,7 +81,7 @@ CREATE TABLE `investors` (
   `id` int(10) UNSIGNED NOT NULL,
   `name` varchar(45) NOT NULL DEFAULT 'Аноним',
   `address` varchar(100) DEFAULT NULL,
-  `Телефон` varchar(15) DEFAULT NULL
+  `Телефон` varchar(20) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -124,7 +124,7 @@ CREATE TABLE `programmers` (
   `id` int(10) UNSIGNED NOT NULL,
   `birthdate` date NOT NULL,
   `name` varchar(70) NOT NULL,
-  `phone` varchar(15) NOT NULL,
+  `phone` varchar(20) NOT NULL,
   `specialization` varchar(45) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -272,7 +272,7 @@ ALTER TABLE `categories`
 -- AUTO_INCREMENT для таблицы `customers`
 --
 ALTER TABLE `customers`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT для таблицы `external_financing`
