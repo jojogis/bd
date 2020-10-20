@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: localhost
--- Время создания: Окт 20 2020 г., 19:23
+-- Время создания: Окт 20 2020 г., 19:43
 -- Версия сервера: 5.7.27-30
 -- Версия PHP: 7.1.30
 
@@ -44,6 +44,22 @@ CREATE TABLE `categories` (
   `name` varchar(45) DEFAULT NULL,
   `parent_id` int(10) UNSIGNED DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Дамп данных таблицы `categories`
+--
+
+INSERT INTO `categories` (`id`, `name`, `parent_id`) VALUES
+(1, 'Web-сайт', NULL),
+(2, 'Интернет-магазин', 1),
+(3, 'Лэндинг', 1),
+(4, 'Блог', 1),
+(5, 'Android приложение', NULL),
+(6, 'IOS приложение', NULL),
+(7, 'Приложения для ПК', NULL),
+(8, 'CRM', 7),
+(9, 'Текстовый редактор', 7),
+(10, 'Соц. сеть', 2);
 
 -- --------------------------------------------------------
 
@@ -282,7 +298,7 @@ ALTER TABLE `acts_of_completion`
 -- AUTO_INCREMENT для таблицы `categories`
 --
 ALTER TABLE `categories`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT для таблицы `customers`
