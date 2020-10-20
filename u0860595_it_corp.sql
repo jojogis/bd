@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: localhost
--- Время создания: Окт 20 2020 г., 18:46
+-- Время создания: Окт 20 2020 г., 19:23
 -- Версия сервера: 5.7.27-30
 -- Версия PHP: 7.1.30
 
@@ -42,7 +42,7 @@ CREATE TABLE `acts_of_completion` (
 CREATE TABLE `categories` (
   `id` int(10) UNSIGNED NOT NULL,
   `name` varchar(45) DEFAULT NULL,
-  `parent_id` int(11) NOT NULL
+  `parent_id` int(10) UNSIGNED DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -335,6 +335,12 @@ ALTER TABLE `tasks`
 --
 -- Ограничения внешнего ключа сохраненных таблиц
 --
+
+--
+-- Ограничения внешнего ключа таблицы `categories`
+--
+ALTER TABLE `categories`
+  ADD CONSTRAINT `fk_category_category1_idx` FOREIGN KEY (`parent_id`) REFERENCES `categories` (`id`) ON DELETE SET NULL ON UPDATE NO ACTION;
 
 --
 -- Ограничения внешнего ключа таблицы `external_financing`
