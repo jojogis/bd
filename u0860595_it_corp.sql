@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: localhost
--- Время создания: Окт 20 2020 г., 20:31
+-- Время создания: Окт 21 2020 г., 12:11
 -- Версия сервера: 5.7.27-30
 -- Версия PHP: 7.1.30
 
@@ -42,24 +42,25 @@ CREATE TABLE `acts_of_completion` (
 CREATE TABLE `categories` (
   `id` int(10) UNSIGNED NOT NULL,
   `name` varchar(45) DEFAULT NULL,
-  `parent_id` int(10) UNSIGNED DEFAULT NULL
+  `parent_id` int(10) UNSIGNED DEFAULT NULL,
+  `test` enum('test1','test2','','') NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Дамп данных таблицы `categories`
 --
 
-INSERT INTO `categories` (`id`, `name`, `parent_id`) VALUES
-(1, 'Web-сайт', NULL),
-(2, 'Интернет-магазин', 1),
-(3, 'Лэндинг', 1),
-(4, 'Блог', 1),
-(5, 'Android приложение', NULL),
-(6, 'IOS приложение', NULL),
-(7, 'Приложения для ПК', NULL),
-(8, 'CRM', 7),
-(9, 'Текстовый редактор', 7),
-(10, 'Соц. сеть', 2);
+INSERT INTO `categories` (`id`, `name`, `parent_id`, `test`) VALUES
+(1, 'Web-сайт', NULL, ''),
+(2, 'Интернет-магазин', 1, ''),
+(3, 'Лэндинг', 1, ''),
+(4, 'Блог', 1, ''),
+(5, 'Android приложение', NULL, ''),
+(6, 'IOS приложение', NULL, ''),
+(7, 'Приложения для ПК', NULL, ''),
+(8, 'CRM', 7, ''),
+(9, 'Текстовый редактор', 7, ''),
+(10, 'Соц. сеть', 2, '');
 
 -- --------------------------------------------------------
 
@@ -183,12 +184,11 @@ CREATE TABLE `programmers` (
 
 CREATE TABLE `projects` (
   `id` int(10) UNSIGNED NOT NULL,
-  `is_by_order` tinyint(4) NOT NULL,
+  `is_by_order` tinyint(1) NOT NULL,
   `name` varchar(45) NOT NULL,
   `planned_release_date` date NOT NULL,
   `real_release_date` date DEFAULT NULL,
   `version` varchar(20) NOT NULL,
-  `task_id` int(10) UNSIGNED NOT NULL,
   `orders_id` int(10) UNSIGNED NOT NULL,
   `categories_id` int(10) UNSIGNED NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -203,7 +203,8 @@ CREATE TABLE `tasks` (
   `id` int(10) UNSIGNED NOT NULL,
   `plan_finish_date` date NOT NULL,
   `real_finish_date` date DEFAULT NULL,
-  `name` varchar(45) DEFAULT NULL
+  `name` varchar(45) DEFAULT NULL,
+  `task_id` int(10) UNSIGNED NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -270,7 +271,6 @@ ALTER TABLE `programmers`
 --
 ALTER TABLE `projects`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `fk_project_task1_idx` (`task_id`),
   ADD KEY `fk_projects_orders1_idx` (`orders_id`),
   ADD KEY `fk_projects_categories1_idx` (`categories_id`);
 
@@ -278,7 +278,8 @@ ALTER TABLE `projects`
 -- Индексы таблицы `tasks`
 --
 ALTER TABLE `tasks`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `fk_id_projects_id` (`task_id`);
 
 --
 -- AUTO_INCREMENT для сохранённых таблиц
@@ -379,9 +380,14 @@ ALTER TABLE `parts_of_tasks`
 -- Ограничения внешнего ключа таблицы `projects`
 --
 ALTER TABLE `projects`
-  ADD CONSTRAINT `fk_project_task1` FOREIGN KEY (`task_id`) REFERENCES `tasks` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   ADD CONSTRAINT `fk_projects_categories1` FOREIGN KEY (`categories_id`) REFERENCES `categories` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   ADD CONSTRAINT `fk_projects_orders1` FOREIGN KEY (`orders_id`) REFERENCES `orders` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+--
+-- Ограничения внешнего ключа таблицы `tasks`
+--
+ALTER TABLE `tasks`
+  ADD CONSTRAINT `fk_id_projects_id` FOREIGN KEY (`task_id`) REFERENCES `projects` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
