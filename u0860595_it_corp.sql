@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: localhost
--- Время создания: Окт 21 2020 г., 12:11
+-- Время создания: Ноя 08 2020 г., 19:28
 -- Версия сервера: 5.7.27-30
 -- Версия PHP: 7.1.30
 
@@ -42,25 +42,24 @@ CREATE TABLE `acts_of_completion` (
 CREATE TABLE `categories` (
   `id` int(10) UNSIGNED NOT NULL,
   `name` varchar(45) DEFAULT NULL,
-  `parent_id` int(10) UNSIGNED DEFAULT NULL,
-  `test` enum('test1','test2','','') NOT NULL
+  `parent_id` int(10) UNSIGNED DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Дамп данных таблицы `categories`
 --
 
-INSERT INTO `categories` (`id`, `name`, `parent_id`, `test`) VALUES
-(1, 'Web-сайт', NULL, ''),
-(2, 'Интернет-магазин', 1, ''),
-(3, 'Лэндинг', 1, ''),
-(4, 'Блог', 1, ''),
-(5, 'Android приложение', NULL, ''),
-(6, 'IOS приложение', NULL, ''),
-(7, 'Приложения для ПК', NULL, ''),
-(8, 'CRM', 7, ''),
-(9, 'Текстовый редактор', 7, ''),
-(10, 'Соц. сеть', 2, '');
+INSERT INTO `categories` (`id`, `name`, `parent_id`) VALUES
+(1, 'Web-сайт', NULL),
+(2, 'Интернет-магазин', 1),
+(3, 'Лэндинг', 1),
+(4, 'Блог', 1),
+(5, 'Android приложение', NULL),
+(6, 'IOS приложение', NULL),
+(7, 'Приложения для ПК', NULL),
+(8, 'CRM', 7),
+(9, 'Текстовый редактор', 7),
+(10, 'Соц. сеть', 2);
 
 -- --------------------------------------------------------
 
@@ -189,9 +188,17 @@ CREATE TABLE `projects` (
   `planned_release_date` date NOT NULL,
   `real_release_date` date DEFAULT NULL,
   `version` varchar(20) NOT NULL,
-  `orders_id` int(10) UNSIGNED NOT NULL,
+  `orders_id` int(10) UNSIGNED DEFAULT NULL,
   `categories_id` int(10) UNSIGNED NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Дамп данных таблицы `projects`
+--
+
+INSERT INTO `projects` (`id`, `is_by_order`, `name`, `planned_release_date`, `real_release_date`, `version`, `orders_id`, `categories_id`) VALUES
+(1, 0, 'Озон', '2020-10-23', NULL, '1.0', NULL, 2),
+(2, 0, 'autodoc', '2018-07-11', '2019-02-14', '2.0', NULL, 2);
 
 -- --------------------------------------------------------
 
@@ -206,6 +213,14 @@ CREATE TABLE `tasks` (
   `name` varchar(45) DEFAULT NULL,
   `task_id` int(10) UNSIGNED NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Дамп данных таблицы `tasks`
+--
+
+INSERT INTO `tasks` (`id`, `plan_finish_date`, `real_finish_date`, `name`, `task_id`) VALUES
+(1, '2021-01-15', NULL, 'Верстка', 1),
+(2, '2018-10-19', '2019-01-24', 'Верстка', 2);
 
 --
 -- Индексы сохранённых таблиц
@@ -337,13 +352,13 @@ ALTER TABLE `programmers`
 -- AUTO_INCREMENT для таблицы `projects`
 --
 ALTER TABLE `projects`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT для таблицы `tasks`
 --
 ALTER TABLE `tasks`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- Ограничения внешнего ключа сохраненных таблиц
