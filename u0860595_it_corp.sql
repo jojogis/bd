@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: localhost
--- Время создания: Ноя 08 2020 г., 19:28
+-- Время создания: Ноя 08 2020 г., 22:08
 -- Версия сервера: 5.7.27-30
 -- Версия PHP: 7.1.30
 
@@ -33,6 +33,16 @@ CREATE TABLE `acts_of_completion` (
   `scan` varchar(45) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+--
+-- Дамп данных таблицы `acts_of_completion`
+--
+
+INSERT INTO `acts_of_completion` (`id`, `date`, `scan`) VALUES
+(1, '2016-12-15', 'complete1.png'),
+(2, '0000-00-00', 'complete2.png'),
+(3, '2016-01-20', 'complete3.png'),
+(4, '2020-08-11', 'complete4.png');
+
 -- --------------------------------------------------------
 
 --
@@ -59,7 +69,8 @@ INSERT INTO `categories` (`id`, `name`, `parent_id`) VALUES
 (7, 'Приложения для ПК', NULL),
 (8, 'CRM', 7),
 (9, 'Текстовый редактор', 7),
-(10, 'Соц. сеть', 2);
+(10, 'Соц. сеть', 2),
+(11, 'Доска объявлений', 1);
 
 -- --------------------------------------------------------
 
@@ -103,6 +114,22 @@ CREATE TABLE `external_financing` (
   `investor_id` int(10) UNSIGNED NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+--
+-- Дамп данных таблицы `external_financing`
+--
+
+INSERT INTO `external_financing` (`id`, `total`, `project_id`, `investor_id`) VALUES
+(1, 1000, 1, 1),
+(2, 0, 1, 3),
+(3, 100000, 1, 6),
+(4, 555, 1, 8),
+(5, 987, 1, 5),
+(6, 123455, 1, 4),
+(7, 100000, 8, 7),
+(8, 1000, 8, 1),
+(9, 100000, 8, 2),
+(10, 100009, 10, 5);
+
 -- --------------------------------------------------------
 
 --
@@ -143,10 +170,22 @@ CREATE TABLE `orders` (
   `deadline` date DEFAULT NULL,
   `date` date NOT NULL,
   `description` longtext NOT NULL,
-  `acts_of_completion_id` int(10) UNSIGNED NOT NULL,
+  `acts_of_completion_id` int(10) UNSIGNED DEFAULT NULL,
   `scan` varchar(45) DEFAULT NULL,
   `customers_id` int(10) UNSIGNED NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Дамп данных таблицы `orders`
+--
+
+INSERT INTO `orders` (`id`, `sum`, `deadline`, `date`, `description`, `acts_of_completion_id`, `scan`, `customers_id`) VALUES
+(5, 100000, '2016-12-15', '2016-01-15', 'Заказ на создание Skype.', NULL, 'order1.png', 2),
+(6, 10, '2020-05-12', '2022-06-13', 'Заказ на создание Office Word 367', NULL, 'order2.png', 2),
+(7, 2000000, '2015-02-02', '2014-12-13', 'Заказ на создание браузера.', 2, 'order22.png', 1),
+(8, 232324, '2016-01-20', '2015-10-20', 'Заказ на создание площадки объявлений.', 3, 'order3.png', 3),
+(9, 250000, '2020-08-11', '2020-01-01', 'Заказ на создание онлайн хранилища.', 4, 'order444.png', 3),
+(10, 245545, '2016-02-03', '2015-02-03', 'Заказ на создание графического редактора.', NULL, 'order6.png', 2);
 
 -- --------------------------------------------------------
 
@@ -157,9 +196,24 @@ CREATE TABLE `orders` (
 CREATE TABLE `parts_of_tasks` (
   `id` int(10) UNSIGNED NOT NULL,
   `name` varchar(45) DEFAULT NULL,
+  `description` text,
   `tasks_id` int(10) UNSIGNED NOT NULL,
   `programmers_id` int(10) UNSIGNED NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Дамп данных таблицы `parts_of_tasks`
+--
+
+INSERT INTO `parts_of_tasks` (`id`, `name`, `description`, `tasks_id`, `programmers_id`) VALUES
+(1, 'Страница корзины', NULL, 1, 1),
+(2, 'header', NULL, 1, 1),
+(3, 'футер', NULL, 1, 1),
+(4, 'хедер, футер', NULL, 2, 1),
+(5, 'Главная страница ', NULL, 1, 1),
+(6, 'Главная страница ', NULL, 2, 7),
+(7, 'Страница поиска', NULL, 1, 7),
+(8, 'Главная страница ', NULL, 3, 7);
 
 -- --------------------------------------------------------
 
@@ -174,6 +228,19 @@ CREATE TABLE `programmers` (
   `phone` varchar(20) NOT NULL,
   `specialization` varchar(45) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Дамп данных таблицы `programmers`
+--
+
+INSERT INTO `programmers` (`id`, `birthdate`, `name`, `phone`, `specialization`) VALUES
+(1, '1990-02-15', 'Никонов Игорь  Александрович', '89090802969', 'Frontend'),
+(2, '1980-01-01', 'Роман Зимин', '89889702213', 'Дизайнер'),
+(3, '1997-10-22', 'Баранников Роман Геннадьевич', '89220323989', 'Тестировщик'),
+(4, '1997-01-01', 'Малиневская Екатерина Витальевна', '89621127011', 'Backend (php,python,java,c#)'),
+(5, '2001-08-21', 'Юлина Екатерина Александровна', '8 888 888 88 88', 'Уборщица'),
+(6, '2000-11-17', 'Корченкина Ангелина Алексеевна', '89220513989', 'seo специалист'),
+(7, '1990-02-03', 'Леонов Николай Петрович', '89620527222', 'Frontend');
 
 -- --------------------------------------------------------
 
@@ -198,7 +265,15 @@ CREATE TABLE `projects` (
 
 INSERT INTO `projects` (`id`, `is_by_order`, `name`, `planned_release_date`, `real_release_date`, `version`, `orders_id`, `categories_id`) VALUES
 (1, 0, 'Озон', '2020-10-23', NULL, '1.0', NULL, 2),
-(2, 0, 'autodoc', '2018-07-11', '2019-02-14', '2.0', NULL, 2);
+(2, 0, 'autodoc', '2018-07-11', '2019-02-14', '2.0', NULL, 2),
+(3, 1, 'Skype', '2016-12-15', '2016-01-15', '2.2', 5, 7),
+(4, 1, 'Office Word 367', '2022-12-17', NULL, '367.1', 6, 9),
+(5, 1, 'Chrome', '2015-02-02', '2016-01-01', '3.5.12', 7, 7),
+(6, 1, 'auto.ru', '2016-01-20', '2016-01-20', '1.0', 8, 11),
+(7, 1, 'YandexDisc', '2020-08-11', '2020-09-11', '1.0', 9, 1),
+(8, 0, 'GIMP', '2020-01-01', '2020-01-01', '2.10.14', NULL, 7),
+(9, 1, 'Paint 3D', '2016-02-03', NULL, '1.5', 10, 7),
+(10, 0, 'uTorrent Web', '2018-03-05', '2019-04-10', '1.0', NULL, 7);
 
 -- --------------------------------------------------------
 
@@ -211,16 +286,22 @@ CREATE TABLE `tasks` (
   `plan_finish_date` date NOT NULL,
   `real_finish_date` date DEFAULT NULL,
   `name` varchar(45) DEFAULT NULL,
-  `task_id` int(10) UNSIGNED NOT NULL
+  `description` text,
+  `project_id` int(10) UNSIGNED NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Дамп данных таблицы `tasks`
 --
 
-INSERT INTO `tasks` (`id`, `plan_finish_date`, `real_finish_date`, `name`, `task_id`) VALUES
-(1, '2021-01-15', NULL, 'Верстка', 1),
-(2, '2018-10-19', '2019-01-24', 'Верстка', 2);
+INSERT INTO `tasks` (`id`, `plan_finish_date`, `real_finish_date`, `name`, `description`, `project_id`) VALUES
+(1, '2021-01-15', NULL, 'Верстка', NULL, 1),
+(2, '2018-10-19', '2019-01-24', 'Верстка', NULL, 2),
+(3, '2016-01-01', '2016-01-01', 'Верстка', NULL, 6),
+(4, '2016-01-30', '2016-01-29', 'Интерфейс', NULL, 3),
+(5, '2020-05-20', '2020-05-19', 'Верстка', NULL, 7),
+(6, '2020-01-01', '2020-01-01', 'Интерфейс', NULL, 8),
+(7, '2018-01-01', '2018-01-03', 'Интерфейс', NULL, 10);
 
 --
 -- Индексы сохранённых таблиц
@@ -294,7 +375,7 @@ ALTER TABLE `projects`
 --
 ALTER TABLE `tasks`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `fk_id_projects_id` (`task_id`);
+  ADD KEY `fk_id_projects_id` (`project_id`);
 
 --
 -- AUTO_INCREMENT для сохранённых таблиц
@@ -304,13 +385,13 @@ ALTER TABLE `tasks`
 -- AUTO_INCREMENT для таблицы `acts_of_completion`
 --
 ALTER TABLE `acts_of_completion`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT для таблицы `categories`
 --
 ALTER TABLE `categories`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT для таблицы `customers`
@@ -322,7 +403,7 @@ ALTER TABLE `customers`
 -- AUTO_INCREMENT для таблицы `external_financing`
 --
 ALTER TABLE `external_financing`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT для таблицы `investors`
@@ -334,31 +415,31 @@ ALTER TABLE `investors`
 -- AUTO_INCREMENT для таблицы `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT для таблицы `parts_of_tasks`
 --
 ALTER TABLE `parts_of_tasks`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT для таблицы `programmers`
 --
 ALTER TABLE `programmers`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT для таблицы `projects`
 --
 ALTER TABLE `projects`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT для таблицы `tasks`
 --
 ALTER TABLE `tasks`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- Ограничения внешнего ключа сохраненных таблиц
@@ -402,7 +483,7 @@ ALTER TABLE `projects`
 -- Ограничения внешнего ключа таблицы `tasks`
 --
 ALTER TABLE `tasks`
-  ADD CONSTRAINT `fk_id_projects_id` FOREIGN KEY (`task_id`) REFERENCES `projects` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+  ADD CONSTRAINT `fk_id_projects_id` FOREIGN KEY (`project_id`) REFERENCES `projects` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
