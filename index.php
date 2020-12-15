@@ -30,12 +30,26 @@
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                         <a class="dropdown-item" href="/db_app/">Проекты</a>
                         <a class="dropdown-item" href="/db_app/orders">Заказы</a>
-                        <a class="dropdown-item" href="#">Категории</a>
                         <a class="dropdown-item" href="/db_app/customers">Заказчики</a>
                         <a class="dropdown-item" href="/db_app/investors">Инвесторы</a>
                         <div class="dropdown-divider"></div>
                         <a class="dropdown-item" href="/db_app/programmers">Программисты</a>
                         <a class="dropdown-item" href="/db_app/tasks">Задачи</a>
+                    </div>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Добавить
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="/db_app/">Проект</a>
+                        <a class="dropdown-item" href="/db_app/orders">Заказ</a>
+                        <a class="dropdown-item" href="#">Категорию</a>
+                        <a class="dropdown-item" href="/db_app/customers">Заказчика</a>
+                        <a class="dropdown-item" href="/db_app/investors">Инвестора</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="/db_app/programmers">Программиста</a>
+                        <a class="dropdown-item" href="/db_app/tasks">Задачу</a>
                     </div>
                 </li>
             </ul>
@@ -70,6 +84,7 @@ use View\ProgrammersView;
 use Repository\ProgrammerRepository;
 use View\TasksView;
 use Repository\TaskRepository;
+use View\ProjectEditView;
 
 $route = explode('?', $_SERVER['REQUEST_URI'])[0];
 $route = explode('/', $route);
@@ -104,8 +119,14 @@ if(count($route) == 3){
     }
 
 
+}else if(count($route) == 5){
+    if($route[2] == "projects" && $route[3] == "edit"){
+        $rep = new ProjectRepository($db);
+        $project = new ProjectEditView($rep,intval($route[4]));
+        $project->render();
+    }
 }
-var_dump($route);
+//var_dump($route);
 
 
 ?>
