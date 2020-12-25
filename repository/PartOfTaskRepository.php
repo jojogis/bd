@@ -26,7 +26,7 @@ class PartOfTaskRepository implements PartOfTaskRepositoryInterface
 
     public function findById(int $id): PartOfTask
     {
-        $res = $this->db->readQuery(sprintf("SELECT * FROM parts_of_tasks WHERE id = %d", $id))[0];
+        $res = $this->db->readQuery("SELECT * FROM parts_of_tasks WHERE id = ?","i", $id)[0];
         return $this->fromStringArray($res);
     }
 
@@ -34,21 +34,19 @@ class PartOfTaskRepository implements PartOfTaskRepositoryInterface
     {
 
         $finishDate = $partOfTask->getFinishDate()->format("Y-m-d");
-        $sql = sprintf("INSERT INTO parts_of_tasks VALUES(NULL,'%s','%s','%s',%d,%d);",
+        return $this->db->writeQuery("INSERT INTO parts_of_tasks VALUES(NULL,'?','?','?',?,?);","sssii",
             $partOfTask->getName(),
             $partOfTask->getDescription(),
             $finishDate,
             $partOfTask->getTaskId(),
             $partOfTask->getProgrammersId()
         );
-
-        return $this->db->writeQuery($sql);
     }
 
     public function update(PartOfTask $partOfTask): bool
     {
         $finishDate = $partOfTask->getFinishDate()->format("Y-m-d");
-        $sql = sprintf("UPDATE parts_of_tasks SET name='%s',description='%s',finish_date='%s',tasks_id=%d,programmers_id=%d WHERE id=%d;",
+        return $this->db->writeQuery("UPDATE parts_of_tasks SET name='?',description='?',finish_date='?',tasks_id=?,programmers_id=? WHERE id=?;","sssiii",
             $partOfTask->getName(),
             $partOfTask->getDescription(),
             $finishDate,
@@ -57,13 +55,11 @@ class PartOfTaskRepository implements PartOfTaskRepositoryInterface
             $partOfTask->getId()
         );
 
-        return $this->db->writeQuery($sql);
     }
 
     public function delete(int $id): bool
     {
-        $sql = sprintf("DELETE FROM parts_of_tasks WHERE id=%d;",$id);
-        return $this->db->writeQuery($sql);
+        return $this->db->writeQuery("DELETE FROM parts_of_tasks WHERE id=?;","i",$id);
     }
     private function fromStringArray(array $res) : PartOfTask{
         return new PartOfTask(

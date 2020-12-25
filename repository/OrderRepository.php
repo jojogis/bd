@@ -23,17 +23,27 @@ class OrderRepository implements OrderRepositoryInterface{
         return $resArr;
     }
 
-    public function findById(int $id): Order
+    public function filter(?int $customerId) : array{
+        $res = $this->db->readQuery("SELECT * FROM orders WHERE customers_id = ?","i", $customerId);
+        $resArr = array();
+        foreach ($res as $row) {
+            array_push($resArr,$this->fromStringArray($row));
+        }
+        return $resArr;
+    }
+
+    public function findById(int $id): ?Order
     {
-        $res = $this->db->readQuery(sprintf("SELECT * FROM orders WHERE id = %d", $id))[0];
-        return $this->fromStringArray($res);
+        $res = $this->db->readQuery("SELECT * FROM orders WHERE id = ?","i", $id);
+        if(count($res) == 0)return null;
+        return $this->fromStringArray($res[0]);
     }
 
     public function create(Order $order): bool
     {
         $deadline = $order->getDeadline()->format("Y-m-d");
         $date = $order->getDate()->format("Y-m-d");
-        $sql = sprintf("INSERT INTO orders VALUES(NULL,%d,'%s','%s','%s','%s',%s,%d);",
+        return $this->db->writeQuery("INSERT INTO orders VALUES(NULL,?,?,?,?,?,?,?);","isssssi",
             $order->getSum(),
             $deadline,
             $date,
@@ -43,15 +53,15 @@ class OrderRepository implements OrderRepositoryInterface{
             !$order->getCustomerId() ? "NULL" : $order->getCustomerId()
         );
 
-        return $this->db->writeQuery($sql);
+
     }
 
     public function update(Order $order): bool
     {
         $deadline = $order->getDeadline()->format("Y-m-d");
         $date = $order->getDate()->format("Y-m-d");
-        $sql = sprintf("UPDATE orders SET sum=%d,deadline='%s',date='%s',description='%s',
-                  acts_of_completion_id=%d,scan=%s,customers_id=%d WHERE id=%d;",
+        return $this->db->writeQuery("UPDATE orders SET sum=?,deadline=?,date=?,description=?,
+                  acts_of_completion_id=?,scan=?,customers_id=? WHERE id=?;","isssssii",
             $order->getSum(),
             $deadline,
             $date,
@@ -61,16 +71,14 @@ class OrderRepository implements OrderRepositoryInterface{
             !$order->getCustomerId() ? "NULL" : $order->getCustomerId(),
             $order->getId()
         );
-        return $this->db->writeQuery($sql);
     }
 
     public function delete(int $id): bool
     {
-        $sql = sprintf("DELETE FROM orders WHERE id=%d;",$id);
-        return $this->db->writeQuery($sql);
+        return $this->db->writeQuery("DELETE FROM orders WHERE id=?;","i",$id);
     }
 
-    private function fromStringArray(array $res) : Order{
+    public function fromStringArray(array $res) : Order{
         return new Order(
             intval($res["id"]),
             intval($res["sum"]),

@@ -28,37 +28,32 @@ class ActOfCompletionRepository implements ActOfCompletionRepositoryInterface
 
     public function findById(int $id): ActOfCompletion
     {
-        $res = $this->db->readQuery(sprintf("SELECT * FROM acts_of_completion WHERE id = %d", $id))[0];
+        $res = $this->db->readQuery("SELECT * FROM acts_of_completion WHERE id = ?","i", $id)[0];
         return $this->fromStringArray($res);
     }
 
     public function create(ActOfCompletion $actOfCompletion): bool
     {
         $date = $actOfCompletion->getDate()->format("Y-m-d");
-        $sql = sprintf("INSERT INTO acts_of_completion VALUES(NULL,'%s','%s');",
+        return $this->db->writeQuery("INSERT INTO acts_of_completion VALUES(NULL,'?','?');","ss",
             $date,
             $actOfCompletion->getScan()
         );
-
-        return $this->db->writeQuery($sql);
     }
 
     public function update(ActOfCompletion $actOfCompletion): bool
     {
         $date = $actOfCompletion->getDate()->format("Y-m-d");
-        $sql = sprintf("UPDATE acts_of_completion SET date='%s',scan='%s' WHERE id=%d;",
+        $this->db->writeQuery("UPDATE acts_of_completion SET date='?',scan='?' WHERE id=?;","ssi",
             $date,
             $actOfCompletion->getScan(),
             $actOfCompletion->getId()
         );
-
-        return $this->db->writeQuery($sql);
     }
 
     public function delete(int $id): bool
     {
-        $sql = sprintf("DELETE FROM acts_of_completion WHERE id=%d;",$id);
-        return $this->db->writeQuery($sql);
+        return $this->db->writeQuery("DELETE FROM acts_of_completion WHERE id=?;","i",$id);
     }
     private function fromStringArray(array $res) : ActOfCompletion{
         return new ActOfCompletion(

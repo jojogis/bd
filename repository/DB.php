@@ -17,17 +17,26 @@ class DB{
       $this->mysqli->query("set names utf8;");
       $this->mysqli->set_charset("utf-8");
   }
-  public function readQuery(string $query) : array{
-    return $this->mysqli->query($query)->fetch_all(MYSQLI_ASSOC);
+  public function readQuery(string $query,?string $types = null,...$params) : array{
+    $stmt = $this->mysqli->prepare($query);
+    if(!is_null($types))$stmt->bind_param($types,...$params);
+    $stmt->execute();
+    return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
   }
 
-  public function writeQuery(string $query) : bool{
-    $res = $this->mysqli->query($query);
-    if($res === FALSE){
-      return false;
-    }else{
-      return true;
-    }
+  public function writeQuery(string $query,?string $types = null,...$params) : bool{
+      $stmt = $this->mysqli->prepare($query);
+      if(!is_null($types))$stmt->bind_param($types,...$params);
+      $stmt->execute();
+      $res = $stmt->get_result();
+      if($res === FALSE){
+        return false;
+      }else{
+        return true;
+      }
+  }
+  public function close(): void{
+      $this->mysqli->close();
   }
 
 }

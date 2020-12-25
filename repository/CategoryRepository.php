@@ -26,38 +26,42 @@ class CategoryRepository implements CategoryRepositoryInterface
 
     public function findById(int $id): Category
     {
-        $res = $this->db->readQuery(sprintf("SELECT * FROM categories WHERE id = %d", $id))[0];
+        $res = $this->db->readQuery("SELECT * FROM categories WHERE id = ?","i", $id)[0];
         return $this->fromStringArray($res);
     }
 
     public function create(Category $category): bool
     {
-        $sql = sprintf("INSERT INTO categories VALUES(NULL,'%s',%d);",
+        return $this->db->writeQuery("INSERT INTO categories VALUES(NULL,?,?);","si",
             $category->getName(),
             !$category->getParentId() ? "NULL" : $category->getParentId()
         );
-
-        return $this->db->writeQuery($sql);
     }
 
     public function update(Category $category): bool
     {
-        $sql = sprintf("UPDATE categories SET name='%s',parent_id=%d WHERE id=%d;",
+        return $this->db->writeQuery("UPDATE categories SET name=?,parent_id=? WHERE id=?;","sii",
             $category->getName(),
             !$category->getParentId() ? "NULL" : $category->getParentId(),
             $category->getId()
         );
 
-        return $this->db->writeQuery($sql);
+    }
+
+    public function getCatPath(int $id) : String{
+        return $this->db->readQuery("SELECT get_category(?) AS res;","i",$id)[0]["res"];
+    }
+
+    public function getCategoryCount(int $id) : int{
+        return $this->db->readQuery("SELECT COUNT(*) FROM projects WHERE categories_id=?;","i",$id)[0]["COUNT(*)"];
     }
 
     public function delete(int $id): bool
     {
-        $sql = sprintf("DELETE FROM categories WHERE id=%d;",$id);
-        return $this->db->writeQuery($sql);
+        return $this->db->writeQuery("DELETE FROM categories WHERE id=?;","i",$id);
     }
 
-    private function fromStringArray(array $res) : Category{
+    public function fromStringArray(array $res) : Category{
         return new Category(
             intval($res["id"]),
             $res["name"],

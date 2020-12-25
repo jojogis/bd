@@ -25,39 +25,37 @@ class InvestorRepository implements InvestorRepositoryInterface
         return $resArr;
     }
 
-    public function findById(int $id): Investor
+    public function findById(int $id): ?Investor
     {
-        $res = $this->db->readQuery(sprintf("SELECT * FROM investors WHERE id = %d", $id))[0];
-        return $this->fromStringArray($res);
+        $res = $this->db->readQuery("SELECT * FROM investors WHERE id = ?","i", $id);
+        if(count($res) == 0)return null;
+        return $this->fromStringArray($res[0]);
     }
 
     public function create(Investor $investor): bool
     {
-        $sql = sprintf("INSERT INTO investors VALUES(NULL,%d,'%s','%s','%s');",
+        return $this->db->writeQuery("INSERT INTO investors VALUES(NULL,?,?,?);","sss",
             $investor->getName(),
             $investor->getAddress(),
             $investor->getPhone()
         );
-        return $this->db->writeQuery($sql);
     }
 
     public function update(Investor $investor): bool
     {
-        $sql = sprintf("UPDATE investors SET name='%s',address='%s',date='%s',phone='%s' WHERE id=%d;",
+        return $this->db->writeQuery("UPDATE investors SET name=?,address=?,phone=? WHERE id=?;","sssi",
             $investor->getName(),
             $investor->getAddress(),
             $investor->getPhone(),
             $investor->getId()
         );
-        return $this->db->writeQuery($sql);
     }
 
     public function delete(int $id): bool
     {
-        $sql = sprintf("DELETE FROM investors WHERE id=%d;",$id);
-        return $this->db->writeQuery($sql);
+        return $this->db->writeQuery("DELETE FROM investors WHERE id=?;","i",$id);
     }
-    private function fromStringArray(array $res) : Investor
+    public function fromStringArray(array $res) : Investor
     {
         return new Investor(
             intval($res["id"]),

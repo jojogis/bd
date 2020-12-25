@@ -25,39 +25,37 @@ class CustomerRepository implements CustomerRepositoryInterface
         return $resArr;
     }
 
-    public function findById(int $id): Customer
+    public function findById(int $id): ?Customer
     {
-        $res = $this->db->readQuery(sprintf("SELECT * FROM customers WHERE id = %d", $id))[0];
-        return $this->fromStringArray($res);
+        $res = $this->db->readQuery("SELECT * FROM customers WHERE id = ?","i", $id);
+        if(count($res) == 0)return null;
+        return $this->fromStringArray($res[0]);
     }
 
     public function create(Customer $customer): bool
     {
-        $sql = sprintf("INSERT INTO customers VALUES(NULL,%d,'%s','%s','%s');",
+        return $this->db->writeQuery("INSERT INTO customers VALUES(NULL,?,?,?);","sss",
             $customer->getName(),
             $customer->getAddress(),
             $customer->getPhone()
         );
-        return $this->db->writeQuery($sql);
     }
 
     public function update(Customer $customer): bool
     {
-        $sql = sprintf("UPDATE customers SET name='%s',address='%s',date='%s',phone='%s' WHERE id=%d;",
+        return $this->db->writeQuery("UPDATE customers SET name=?,address=?,phone=? WHERE id=?;","sssi",
             $customer->getName(),
             $customer->getAddress(),
             $customer->getPhone(),
             $customer->getId()
         );
-        return $this->db->writeQuery($sql);
     }
 
     public function delete(int $id): bool
     {
-        $sql = sprintf("DELETE FROM customers WHERE id=%d;",$id);
-        return $this->db->writeQuery($sql);
+        return $this->db->writeQuery("DELETE FROM customers WHERE id=?;","i",$id);
     }
-    private function fromStringArray(array $res) : Customer
+    public function fromStringArray(array $res) : Customer
     {
         return new Customer(
             intval($res["id"]),

@@ -22,42 +22,54 @@ class ExternalFinancingRepository implements ExternalFinancingRepositoryInterfac
         }
         return $resArr;
     }
+    public function filter(?int $projectId=null,?int $investorId=null) : array{
+        if(is_null($projectId) && !is_null($investorId)){
+            $res = $this->db->readQuery("SELECT * FROM external_financing WHERE investor_id = ?","i", $investorId);
+        }else if(!is_null($projectId) && is_null($investorId)){
+            $res = $this->db->readQuery("SELECT * FROM external_financing WHERE project_id = ?","i", $projectId);
+        }else{
+            $res = $this->db->readQuery("SELECT * FROM external_financing WHERE project_id = ? AND investor_id=?","ii", $projectId,$investorId);
+        }
 
-    public function findById(int $id): ExternalFinancing
+        $resArr = array();
+        foreach ($res as $row) {
+            array_push($resArr,$this->fromStringArray($row));
+        }
+        return $resArr;
+    }
+
+    public function findById(int $id): ?ExternalFinancing
     {
-        $res = $this->db->readQuery(sprintf("SELECT * FROM external_financing WHERE id = %d", $id))[0];
-        return $this->fromStringArray($res);
+        $res = $this->db->readQuery("SELECT * FROM external_financing WHERE id = ?","i", $id);
+        if(count($res) == 0)return null;
+        return $this->fromStringArray($res[0]);
     }
 
     public function create(ExternalFinancing $externalFinancing): bool
     {
-        $sql = sprintf("INSERT INTO external_financing VALUES(NULL,%d,%d,%d);",
+        return $this->db->writeQuery("INSERT INTO external_financing VALUES(NULL,?,?,?);","iii",
             $externalFinancing->getTotal(),
             $externalFinancing->getProjectId(),
             $externalFinancing->getInvestorId()
         );
-
-        return $this->db->writeQuery($sql);
     }
 
     public function update(ExternalFinancing $externalFinancing): bool
     {
-        $sql = sprintf("UPDATE external_financing SET total=%d,project_id=%d,investor_id=%d WHERE id=%d;",
+        return $this->db->writeQuery("UPDATE external_financing SET total=?,project_id=?,investor_id=? WHERE id=?;","iiii",
             $externalFinancing->getTotal(),
             $externalFinancing->getProjectId(),
             $externalFinancing->getInvestorId(),
             $externalFinancing->getId()
         );
-
-        return $this->db->writeQuery($sql);
     }
 
     public function delete(int $id): bool
     {
-        $sql = sprintf("DELETE FROM external_financing WHERE id=%d;",$id);
-        return $this->db->writeQuery($sql);
+        return $this->db->writeQuery("DELETE FROM external_financing WHERE id=?;","i",$id);
+
     }
-    private function fromStringArray(array $res) : ExternalFinancing{
+    public function fromStringArray(array $res) : ExternalFinancing{
         return new ExternalFinancing(
             intval($res["id"]),
             intval($res["total"]),

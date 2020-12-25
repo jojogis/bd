@@ -12,6 +12,14 @@ class ProjectRepository implements ProjectRepositoryInterface{
     $this->db = $db;
   }
 
+  public function filter(?int $categoryId = null) : array{
+    $res = $this->db->readQuery("SELECT * FROM projects WHERE categories_id = ?","i", $categoryId);
+    $resArr = array();
+    foreach ($res as $row) {
+      array_push($resArr,$this->fromStringArray($row));
+    }
+    return $resArr;
+  }
 
   public function findAll() : array{
     $resArr = array();
@@ -22,15 +30,22 @@ class ProjectRepository implements ProjectRepositoryInterface{
     return $resArr;
   }
 
-  public function findById(int $id) : Project{
-    $res = $this->db->readQuery(sprintf("SELECT * FROM projects WHERE id = %d", $id))[0];
-    return $this->fromStringArray($res);
+  public function findById(int $id) : ?Project{
+    $res = $this->db->readQuery("SELECT * FROM projects WHERE id = ?;","i", $id);
+    if(count($res) == 0)return null;
+    return $this->fromStringArray($res[0]);
+  }
+
+  public function findByOrdersId(int $orders_id) : ?Project{
+    $res = $this->db->readQuery("SELECT * FROM projects WHERE orders_id = ?;","i", $orders_id);
+    if(count($res) == 0)return null;
+    return $this->fromStringArray($res[0]);
   }
 
   public function create(Project $p) : bool{
     $plannedReleaseDate = $p->getPlannedReleaseDate()->format("Y-m-d");
-    $realReleaseDate = $p->getRealReleaseDate()->format("Y-m-d");
-    $sql = sprintf("INSERT INTO projects VALUES(NULL,%d,'%s','%s','%s','%s',%s,%d);",
+    $realReleaseDate = is_null($p->getRealReleaseDate()) ? null: $p->getRealReleaseDate()->format("Y-m-d");
+    return $this->db->writeQuery("INSERT INTO projects VALUES(NULL,?,?,?,?,?,?,?);","isssssi",
       (int)$p->getIsByOrder(),
       $p->getName(),
       $plannedReleaseDate,
@@ -40,37 +55,35 @@ class ProjectRepository implements ProjectRepositoryInterface{
       $p->getCategoriesId()
     );
 
-    return $this->db->writeQuery($sql);
+
   }
 
   public function update(Project $p) : bool{
     $plannedReleaseDate = $p->getPlannedReleaseDate()->format("Y-m-d");
-    $realReleaseDate = $p->getRealReleaseDate()->format("Y-m-d");
-    $sql = sprintf("UPDATE projects SET is_by_order=%d,name='%s',planned_release_date='%s',
-      real_release_date='%s',version='%s',orders_id=%s,categories_id=%d WHERE id=%d;",
+    $realReleaseDate = is_null($p->getRealReleaseDate()) ? null: $p->getRealReleaseDate()->format("Y-m-d");
+    return $this->db->writeQuery("UPDATE projects SET is_by_order=?,name=?,planned_release_date=?,
+      real_release_date=?,version=?,orders_id=?,categories_id=? WHERE id=?;","issssiii",
       (int)$p->getIsByOrder(),
       $p->getName(),
       $plannedReleaseDate,
       $realReleaseDate,
       $p->getVersion(),
-      !$p->getOrdersId() ? "NULL" : $p->getOrdersId(),
+      !$p->getOrdersId() ? NULL : $p->getOrdersId(),
       $p->getCategoriesId(),
-      $p->getId()
+      $p->getId(),
     );
 
-    return $this->db->writeQuery($sql);
   }
 
   public function delete(int $id) : bool{
-    $sql = sprintf("DELETE FROM projects WHERE id=%d;",$id);
-    return $this->db->writeQuery($sql);
+    return $this->db->writeQuery("DELETE FROM projects WHERE id=?;","i",$id);
   }
 
   public function getBreadcrumbs(int $id) : String{
-    return $this->db->readQuery(sprintf("SELECT get_category(%d) AS res;",$id))[0]["res"];
+    return $this->db->readQuery("SELECT get_category(?) AS res;","i",$id)[0]["res"];
   }
 
-  private function fromStringArray(array $res) : Project{
+  public function fromStringArray(array $res) : Project{
     return new Project(
       intval($res["id"]),
       boolval($res["is_by_order"]),

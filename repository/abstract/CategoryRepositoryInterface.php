@@ -15,4 +15,9 @@ interface CategoryRepositoryInterface
     public function update(Category $category) : bool;
 
     public function delete(int $id) : bool;
+
+    public function getCatPath(int $id) : String;
+
+    public function getCategoryCount(int $id) : int;
+    public function fromStringArray(array $res) : Category;
 }

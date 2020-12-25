@@ -7,13 +7,17 @@ interface OrderRepositoryInterface{
 
     public function findAll() : array;
 
-    public function findById(int $id) : Order;
+    public function findById(int $id) : ?Order;
 
     public function create(Order $order) : bool;
 
     public function update(Order $order) : bool;
 
     public function delete(int $id) : bool;
+
+    public function filter(?int $customerId) : array;
+
+    public function fromStringArray(array $res) : Order;
 }
 
 

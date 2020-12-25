@@ -26,45 +26,44 @@ class ProgrammerRepository implements ProgrammerRepositoryInterface
         return $resArr;
     }
 
-    public function findById(int $id): Programmer
+    public function findById(int $id): ?Programmer
     {
-        $res = $this->db->readQuery(sprintf("SELECT * FROM programmers WHERE id = %d", $id))[0];
-        return $this->fromStringArray($res);
+        $res = $this->db->readQuery("SELECT * FROM programmers WHERE id = ?","i", $id);
+        if(count($res) == 0)return null;
+        return $this->fromStringArray($res[0]);
     }
 
     public function create(Programmer $programmer): bool
     {
         $birthdate = $programmer->getBirthdate()->format("Y-m-d");
-        $sql = sprintf("INSERT INTO programmers VALUES(NULL,'%s','%s','%s','%s');",
+        return $this->db->writeQuery("INSERT INTO programmers VALUES(NULL,?,?,?,?);","ssss",
             $birthdate,
             $programmer->getName(),
             $programmer->getPhone(),
             $programmer->getSpecialization(),
         );
 
-        return $this->db->writeQuery($sql);
     }
 
     public function update(Programmer $programmer): bool
     {
         $birthdate = $programmer->getBirthdate()->format("Y-m-d");
-        $sql = sprintf("UPDATE programmers SET birthdate='%s',name='%s',phone='%s',specialization ='%s' WHERE id=%d;",
+        return $this->db->writeQuery("UPDATE programmers SET birthdate=?,name=?,phone=?,specialization =? WHERE id=?;","ssssi",
             $birthdate,
             $programmer->getName(),
             $programmer->getPhone(),
             $programmer->getSpecialization(),
             $programmer->getId()
         );
-        return $this->db->writeQuery($sql);
+
     }
 
     public function delete(int $id): bool
     {
-        $sql = sprintf("DELETE FROM programmers WHERE id=%d;",$id);
-        return $this->db->writeQuery($sql);
+        return $this->db->writeQuery("DELETE FROM programmers WHERE id=?;","i",$id);
     }
 
-    private function fromStringArray(array $res) : Programmer{
+    public function fromStringArray(array $res) : Programmer{
         return new Programmer(
             intval($res["id"]),
             new DateTime($res["birthdate"]),

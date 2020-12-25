@@ -25,32 +25,32 @@ class TaskRepository implements TaskRepositoryInterface
         return $resArr;
     }
 
-    public function findById(int $id): Task
+    public function findById(int $id): ?Task
     {
-        $res = $this->db->readQuery(sprintf("SELECT * FROM tasks WHERE id = %d", $id))[0];
-        return $this->fromStringArray($res);
+        $res = $this->db->readQuery("SELECT * FROM tasks WHERE id = ?","i", $id);
+        if(count($res) == 0)return null;
+        return $this->fromStringArray($res[0]);
     }
 
     public function create(Task $task): bool
     {
         $plan_finish_date  = $task->getPlanFinishDate()->format("Y-m-d");
-        $real_finish_date   = $task->getRealFinishDate()->format("Y-m-d");
-        $sql = sprintf("INSERT INTO tasks VALUES(NULL,'%s','%s','%s','%s',%d);",
+        $real_finish_date = is_null($task->getRealFinishDate()) ? null: $task->getRealFinishDate()->format("Y-m-d");
+        return $this->db->writeQuery("INSERT INTO tasks VALUES(NULL,?,?,?,?,?);","ssssi",
             $plan_finish_date,
             $real_finish_date,
             $task->getName(),
             $task->getDescription(),
             !$task->getProjectId() ? "NULL" : $task->getProjectId()
         );
-
-        return $this->db->writeQuery($sql);
     }
 
     public function update(Task $task): bool
     {
         $plan_finish_date  = $task->getPlanFinishDate()->format("Y-m-d");
-        $real_finish_date   = $task->getRealFinishDate()->format("Y-m-d");
-        $sql = sprintf("UPDATE tasks SET plan_finish_date='%s',real_finish_date='%s',name='%s',description='%s',project_id=%d WHERE id=%d",
+        $real_finish_date = is_null($task->getRealFinishDate()) ? null: $task->getRealFinishDate()->format("Y-m-d");
+        return $this->db->writeQuery("UPDATE tasks SET plan_finish_date=?,real_finish_date=?,name=?,description=?,project_id=? WHERE id=?",
+            "ssssii",
             $plan_finish_date,
             $real_finish_date,
             $task->getName(),
@@ -62,10 +62,9 @@ class TaskRepository implements TaskRepositoryInterface
 
     public function delete(int $id): bool
     {
-        $sql = sprintf("DELETE FROM tasks WHERE id=%d;",$id);
-        return $this->db->writeQuery($sql);
+        return $this->db->writeQuery("DELETE FROM tasks WHERE id=?;","i",$id);
     }
-    private function fromStringArray(array $res) : Task
+    public function fromStringArray(array $res) : Task
     {
         return new Task(
             intval($res["id"]),
